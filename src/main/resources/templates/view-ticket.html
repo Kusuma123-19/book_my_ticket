@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Ticket | BookMyTicket</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+<!-- Bootstrap -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
+<!-- Google Font -->
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap"
+	rel="stylesheet">
+
+<style>
+:root {
+	--bg-main: #0f172a;
+	--bg-card: #111827;
+	--border-soft: #1f2937;
+	--text-main: #e5e7eb;
+	--text-muted: #9ca3af;
+	--accent: #22c55e;
+	--accent-pink: #ff4081;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Poppins", sans-serif;
+	background: radial-gradient(circle at top, #1e293b, var(--bg-main));
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-main);
+	padding: 20px;
+}
+
+/* Ticket Container */
+.ticket-wrapper {
+	width: 100%;
+	max-width: 450px;
+	animation: slideUp 0.7s ease;
+}
+
+/* Ticket Card */
+.ticket-card {
+	background: #ffffff;
+	color: #1a2332;
+	border-radius: 24px;
+	overflow: hidden;
+	box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+	position: relative;
+}
+
+/* Top Section (Gradiant) */
+.ticket-header {
+	background: linear-gradient(135deg, #6496ff, #ff4081);
+	padding: 30px;
+	text-align: center;
+	color: white;
+}
+
+.ticket-header h1 {
+	font-weight: 900;
+	font-size: 1.5rem;
+	margin-bottom: 5px;
+	letter-spacing: 1px;
+}
+
+.ticket-header p {
+	font-size: 0.85rem;
+	opacity: 0.9;
+	font-weight: 500;
+}
+
+/* Main Body */
+.ticket-body {
+	padding: 35px;
+}
+
+.movie-name {
+	font-size: 1.6rem;
+	font-weight: 800;
+	text-align: center;
+	margin-bottom: 25px;
+	color: #0f172a;
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	margin-bottom: 30px;
+}
+
+.info-item label {
+	display: block;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	color: #64748b;
+	font-weight: 700;
+	margin-bottom: 4px;
+}
+
+.info-item span {
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: #1e293b;
+}
+
+/* QR Code Section */
+.qr-section {
+	text-align: center;
+	padding: 25px;
+	background: #f8fafc;
+	border-top: 2px dashed #e2e8f0;
+	position: relative;
+}
+
+/* Perforated edge effect */
+.qr-section::before, .qr-section::after {
+	content: '';
+	position: absolute;
+	top: -12px;
+	width: 24px;
+	height: 24px;
+	background: var(--bg-main);
+	border-radius: 50%;
+}
+
+.qr-section::before { left: -12px; }
+.qr-section::after { right: -12px; }
+
+.qr-image {
+	width: 160px;
+	height: 160px;
+	margin-bottom: 15px;
+	border-radius: 12px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.payment-id {
+	font-size: 0.75rem;
+	color: #94a3b8;
+	font-family: monospace;
+}
+
+/* Success Banner */
+.success-banner {
+	background: #dcfce7;
+	color: #166534;
+	text-align: center;
+	padding: 8px;
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+/* Actions */
+.actions {
+	margin-top: 30px;
+	text-align: center;
+}
+
+.btn-home {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid var(--border-soft);
+	color: white;
+	padding: 12px 30px;
+	border-radius: 14px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: all 0.25s ease;
+}
+
+.btn-home:hover {
+	background: var(--accent-pink);
+	border-color: var(--accent-pink);
+	transform: translateY(-2px);
+}
+
+@keyframes slideUp {
+	from { transform: translateY(50px); opacity: 0; }
+	to { transform: translateY(0); opacity: 1; }
+}
+
+</style>
+</head>
+
+<body>
+
+	<div class="ticket-wrapper">
+
+		<div class="ticket-card">
+			<div class="success-banner">✓ Payment Successful</div>
+			
+			<div class="ticket-header">
+				<h1>BOOK MY TICKET</h1>
+				<p>Order ID: <span th:text="${ticket.orderId}"></span></p>
+			</div>
+
+			<div class="ticket-body">
+				<div class="movie-name" th:text="${ticket.movieName}"></div>
+
+				<div class="info-grid">
+					<div class="info-item">
+						<label>Date</label>
+						<span th:text="${ticket.showDate}"></span>
+					</div>
+					<div class="info-item">
+						<label>Time</label>
+						<span th:text="${ticket.showTiming}"></span>
+					</div>
+					<div class="info-item">
+						<label>Theater</label>
+						<span th:text="${ticket.theaterName}"></span>
+					</div>
+					<div class="info-item">
+						<label>Screen</label>
+						<span th:text="${ticket.screenName}"></span>
+					</div>
+					<div class="info-item">
+						<label>Seats</label>
+						<span>
+							<span th:each="seat, iter : ${ticket.seatNumber}" 
+								  th:text="${seat} + ${!iter.last ? ', ' : ''}"></span>
+						</span>
+					</div>
+					<div class="info-item">
+						<label>Tickets</label>
+						<span th:text="${ticket.ticketCount}"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="qr-section">
+				<img th:src="${ticket.qrUrl}" class="qr-image" alt="QR Code">
+				<div class="payment-id">PID: <span th:text="${ticket.paymentId}"></span></div>
+			</div>
+		</div>
+
+		<div class="actions">
+			<a href="/" class="btn-home">Back to Home</a>
+		</div>
+
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
