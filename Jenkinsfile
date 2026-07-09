@@ -12,7 +12,7 @@ pipeline {
             }
             post {
                 success {
-                    echo "build success"
+                    echo "build success1"
                 }
                 failure {
                     echo "build failure"
