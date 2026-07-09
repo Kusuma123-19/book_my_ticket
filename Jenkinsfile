@@ -12,10 +12,10 @@ pipeline {
             }
             post {
                 success {
-                    echo "build success1"
+                    echo "build success"
                 }
                 failure {
-                    echo "build failure211"
+                    echo "build failure"
                 }
             }
         }
@@ -32,22 +32,22 @@ pipeline {
                 }
             }
         }
-        // stage("Run the spring application") {
-        //     steps { 
-        //         sh '''
-        //             echo "Stopping existing Spring Boot application if running..."
-        //             if pgrep -f spring_app_sak-0.0.1-SNAPSHOT.jar > /dev/null; then
-        //                 sudo pkill -f spring_app_sak-0.0.1-SNAPSHOT.jar
-        //                 echo "Application stopped."
-        //             else
-        //                 echo "No existing application running."
-        //             fi
+        stage("Run the spring application") {
+            steps { 
+                sh '''
+                    echo "Stopping existing Spring Boot application if running..."
+                    if pgrep -f book-my-ticket-0.0.1-SNAPSHOT.jar > /dev/null; then
+                        sudo pkill -f book-my-ticket-0.0.1-SNAPSHOT.jar
+                        echo "Application stopped."
+                    else
+                        echo "No existing application running."
+                    fi
 
-        //             echo "Starting the Spring Boot application..."
-        //             sudo java -jar target/spring_app_sak-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
-        //         '''
-        //     }
-        // }
+                    echo "Starting the Spring Boot application..."
+                    sudo java -jar target/book-my-ticket-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+                '''
+            }
+        }
     }
     post {
         success {
