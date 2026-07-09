@@ -44,7 +44,7 @@ pipeline {
                     fi
 
                     echo "Starting the Spring Boot application..."
-                    sudo java -jar target/book-my-ticket-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+                    sudo java -jar target/book-my-ticket-0.0.1-SNAPSHOT.jar > spring-boot-app.log 2>&1 &
                 '''
             }
         }
