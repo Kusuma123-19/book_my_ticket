@@ -1,6 +1,6 @@
 server:
-  port: 9091
-spring:
+  port: 8085
+  spring:
   application:
     name: book-my-ticket
 
