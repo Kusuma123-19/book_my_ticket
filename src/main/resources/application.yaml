@@ -13,7 +13,7 @@ spring:
   datasource:
     url: jdbc:mysql://database-1.czqsqu2o243l.ap-south-1.rds.amazonaws.com:3306/book-my-ticket?createDatabaseIfNotExist=true
     username: admin
-    password: admin@123
+    password: Rootadmin123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
