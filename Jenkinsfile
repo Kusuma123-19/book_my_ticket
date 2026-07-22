@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17'          // adjust to whatever JDK name you configured in Jenkins Global Tool Config
-        maven 'Maven3'       // same — must match the name in Manage Jenkins > Tools
+        jdk 'JDK17'          // must match the name you configured in Manage Jenkins > Tools
+        maven 'Maven3'       // must match the name you configured in Manage Jenkins > Tools
     }
 
-   environment {
+    environment {
     DB_USERNAME     = 'admin'
     DB_PASSWORD     = 'admin@123'
     MAIL_USERNAME   = 'kusumacr19@gmail.com'
@@ -20,7 +20,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/YourUsername/book-my-ticket.git'
+                git branch: 'main', url: 'https://github.com/Kusuma123-19/book_my_ticket.git'
             }
         }
 
