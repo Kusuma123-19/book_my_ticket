@@ -6,16 +6,15 @@ pipeline {
         maven 'Maven3'       // same — must match the name in Manage Jenkins > Tools
     }
 
-    environment {
-        // Pull sensitive values from Jenkins Credentials Store instead of hardcoding
-        DB_USERNAME     = credentials('db-username')
-        DB_PASSWORD     = credentials('db-password')
-        MAIL_USERNAME   = credentials('mail-username')
-        MAIL_PASSWORD   = credentials('mail-password')
-        ADMIN_EMAIL     = credentials('admin-email')
-        ADMIN_PASSWORD  = credentials('admin-password')
-        CLOUDINARY_URL  = credentials('cloudinary-url')
-    }
+   environment {
+    DB_USERNAME     = 'admin'
+    DB_PASSWORD     = 'admin@123'
+    MAIL_USERNAME   = 'kusumacr19@gmail.com'
+    MAIL_PASSWORD   = 'geylgfuvsnnrhwsj'
+    ADMIN_EMAIL     = 'admin@gmail.com'
+    ADMIN_PASSWORD  = 'admin'
+    CLOUDINARY_URL  = 'cloudinary://123456789012345:dummy_secret@dummy_cloud'
+}
 
     stages {
 
