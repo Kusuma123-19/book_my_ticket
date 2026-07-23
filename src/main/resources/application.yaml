@@ -1,5 +1,6 @@
 server:
   port: 8085
+
 spring:
   application:
     name: book-my-ticket
@@ -10,8 +11,8 @@ spring:
       max-request-size: 10MB
 
   datasource:
-    url: jdbc:mysql://13.207.201.152:3306/book-my-ticket?createDatabaseIfNotExist=true
-    username: admin
+    url: jdbc:mysql://mysql-container:3306/book-my-ticket?createDatabaseIfNotExist=true
+    username: root
     password: admin@123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -19,17 +20,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-    # ❌ DO NOT SET OLD DIALECT (REMOVE COMPLETELY)
-    # Hibernate 7 auto-detects dialect
-
     properties:
       hibernate:
         format_sql: true
 
   data:
     redis:
-      url: redis://localhost:6379
+      url: redis://redis-container:6379
 
   mail:
     host: smtp.gmail.com
@@ -48,4 +45,4 @@ admin:
   password: admin
 
 cloudinary:
-  url: ${CLOUDINARY_URL:cloudinary://123456789012345:dummy_secret@dummy_cloud}
+  url: cloudinary://123456789012345:dummy_secret@dummy_cloud
