@@ -11,9 +11,9 @@ spring:
       max-request-size: 10MB
 
   datasource:
-    url: jdbc:mysql://mysql-container:3306/book-my-ticket?createDatabaseIfNotExist=true
-    username: root
-    password: admin@123
+    url: ${DB_URL:jdbc:mysql://mysql-container:3306/book-my-ticket?createDatabaseIfNotExist=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:admin@123}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -45,4 +45,4 @@ admin:
   password: admin
 
 cloudinary:
-  url: cloudinary://123456789012345:dummy_secret@dummy_cloud
+  url: ${CLOUDINARY_URL:cloudinary://123456789012345:dummy_secret@dummy_cloud}

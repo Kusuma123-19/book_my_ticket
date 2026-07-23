@@ -2,14 +2,21 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'   // Must match the Maven installation name configured in Jenkins Global Tool Configuration
-        jdk 'JDK21'      // Must match the JDK installation name configured in Jenkins Global Tool Configuration
+        maven 'Maven3'
+        jdk 'JDK17'
     }
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')   // Jenkins credential ID for Docker Hub
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE          = "kusumacr21/book-my-ticket"
         IMAGE_TAG             = "${env.BUILD_NUMBER}"
+        DB_USERNAME     = 'admin'
+        DB_PASSWORD     = 'admin@123'
+        MAIL_USERNAME   = 'kusumacr19@gmail.com'
+        MAIL_PASSWORD   = 'geylgfuvsnnrhwsj'
+        ADMIN_EMAIL     = 'admin@gmail.com'
+        ADMIN_PASSWORD  = 'admin'
+        CLOUDINARY_URL  = 'cloudinary://123456789012345:dummy_secret@dummy_cloud'
     }
 
     options {
@@ -17,6 +24,16 @@ pipeline {
         skipDefaultCheckout(false)
         disableConcurrentBuilds()
     }
+
+    environment {
+    DB_USERNAME     = 'admin'
+    DB_PASSWORD     = 'admin@123'
+    MAIL_USERNAME   = 'kusumacr19@gmail.com'
+    MAIL_PASSWORD   = 'geylgfuvsnnrhwsj'
+    ADMIN_EMAIL     = 'admin@gmail.com'
+    ADMIN_PASSWORD  = 'admin'
+    CLOUDINARY_URL  = 'cloudinary://123456789012345:dummy_secret@dummy_cloud'
+}
 
     stages {
 
@@ -50,6 +67,9 @@ pipeline {
         }
 
         stage('Docker Login & Push') {
+            when {
+                expression { env.DOCKERHUB_CREDENTIALS }
+            }
             steps {
                 sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
                 sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
@@ -60,8 +80,16 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    docker compose down
-                    docker compose up -d --build
+                    pkill -f book-my-ticket.jar || true
+                    nohup java -jar target/book-my-ticket-0.0.1-SNAPSHOT.jar \
+                        --spring.datasource.username=$DB_USERNAME \
+                        --spring.datasource.password=$DB_PASSWORD \
+                        --spring.mail.username=$MAIL_USERNAME \
+                        --spring.mail.password=$MAIL_PASSWORD \
+                        --admin.email=$ADMIN_EMAIL \
+                        --admin.password=$ADMIN_PASSWORD \
+                        --cloudinary.url=$CLOUDINARY_URL \
+                        > app.log 2>&1 &
                 '''
             }
         }
@@ -75,8 +103,32 @@ pipeline {
             echo "❌ Build #${env.BUILD_NUMBER} failed. Check logs above."
         }
         always {
-            sh 'docker logout'
+            sh 'docker logout || true'
             cleanWs()
+        }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    pkill -f book-my-ticket.jar || true
+                    nohup java -jar target/book-my-ticket-0.0.1-SNAPSHOT.jar \
+                        --spring.datasource.username=$DB_USERNAME \
+                        --spring.datasource.password=$DB_PASSWORD \
+                        --spring.mail.username=$MAIL_USERNAME \
+                        --spring.mail.password=$MAIL_PASSWORD \
+                        --admin.email=$ADMIN_EMAIL \
+                        --admin.password=$ADMIN_PASSWORD \
+                        --cloudinary.url=$CLOUDINARY_URL \
+                        > app.log 2>&1 &
+                '''
+            }
+        }
+
+        stage('Done') {
+            steps {
+                echo 'Deployment completed successfully.'
+            }
         }
     }
 }
