@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ACTION', choices: ['deploy-db', 'deploy-app', 'remove-app', 'remove-db'], description: 'Choose action')
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Image tag to deploy (used for deploy-app)')
+    }
+
+    environment {
+        KUBECONFIG_CRED = credentials('kubeconfig-cred')
+        DOCKER_IMAGE     = 'kusumacr21/book-my-ticket'
+        NAMESPACE        = 'production'
+    }
+
+    stages {
+
+        stage('Namespace') {
+            when { expression { params.ACTION == 'deploy-db' || params.ACTION == 'deploy-app' } }
+            steps {
+                sh 'kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/namespace.yaml'
+            }
+        }
+
+        stage('Deploy DB') {
+            when { expression { params.ACTION == 'deploy-db' } }
+            steps {
+                sh '''
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/mysql-service.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/mysql-statefulset.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/redis-deployment.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/redis-service.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production rollout status statefulset/mysql
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production rollout status deployment/redis
+                '''
+            }
+        }
+
+        stage('Deploy App') {
+            when { expression { params.ACTION == 'deploy-app' } }
+            steps {
+                sh '''
+                  sed "s#kusumacr21/book-my-ticket:latest#${DOCKER_IMAGE}:${IMAGE_TAG}#" \
+                     k8s/app-deployment.yaml > /tmp/app-deployment-rendered.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f /tmp/app-deployment-rendered.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED apply -f k8s/app-service.yaml
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production rollout status deployment/book-my-ticket-app
+                '''
+            }
+        }
+
+        stage('Remove App') {
+            when { expression { params.ACTION == 'remove-app' } }
+            steps {
+                sh '''
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/app-service.yaml --ignore-not-found
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/app-deployment.yaml --ignore-not-found
+                '''
+            }
+        }
+
+        stage('Remove DB') {
+            when { expression { params.ACTION == 'remove-db' } }
+            steps {
+                sh '''
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/mysql-statefulset.yaml --ignore-not-found
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/mysql-service.yaml --ignore-not-found
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/redis-deployment.yaml --ignore-not-found
+                  kubectl --kubeconfig=$KUBECONFIG_CRED -n production delete -f k8s/redis-service.yaml --ignore-not-found
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'kubectl --kubeconfig=$KUBECONFIG_CRED -n production get pods,svc || true'
+        }
+    }
+}
