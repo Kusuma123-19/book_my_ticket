@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven3'
-        jdk 'JDK21'
-    }
-
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE          = "kusumacr21/book-my-ticket"
@@ -28,13 +23,14 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'chmod +x mvnw'
+                sh './mvnw clean package -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh './mvnw test'
             }
             post {
                 always {
@@ -57,19 +53,17 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Clean Up') {
             steps {
-                sh '''
-                    docker-compose down
-                    docker-compose up -d --build
-                '''
+                sh "docker rmi ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest || true"
+                sh 'docker system prune -f || true'
             }
         }
     }
 
     post {
         success {
-            echo "Build succeeded"
+            echo "Build succeeded — image pushed: ${DOCKER_IMAGE}:${IMAGE_TAG}"
         }
         failure {
             echo "Build failed"
